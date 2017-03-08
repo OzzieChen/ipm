@@ -23,9 +23,14 @@
 
 	<context:annotation-config />
 	<!-- 自动扫描注解的bean -->
-	<!-- <context:component-scan base-package="com.bonult.me.task" />
-	<context:component-scan base-package="com.bonult.me.service.impl" /> -->
+	<!-- <context:component-scan base-package="net.xssu.ipm.task" /> -->
+	<context:component-scan base-package="net.xssu.ipm.service.impl" />
 
 	<task:annotation-driven scheduler="qbScheduler" mode="proxy" />
 	<task:scheduler id="qbScheduler" pool-size="10" />
+	
+	<bean class="net.xssu.ipm.utils.SpringUtils" />
+
+	<import resource="classpath:springConfig/spring-dao.xml" />
+	<import resource="classpath:springConfig/spring-transaction.xml" />
 </beans>

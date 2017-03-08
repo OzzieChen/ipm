@@ -1,0 +1,26 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<footer class="footer mt-20">
+	<div class="container-fluid">
+		<nav>
+			<a href="${pageContext.request.contextPath }/" target="_blank">关于我们</a> <span class="pipe">|</span> <a href="${pageContext.request.contextPath }/" target="_blank">联系我们</a> <span class="pipe">|</span>
+			<a href="${pageContext.request.contextPath }/" target="_blank">法律声明</a>
+		</nav>
+		<p>
+			Copyright &copy;2017 服务探测系统 All Rights Reserved.
+			<br>
+			<a href="http://www.miitbeian.gov.cn/" target="_blank" rel="nofollow">京ICP备1000000号</a>
+			<br>
+		</p>
+	</div>
+	<c:if test="${not empty message}">
+		<script type="text/javascript">
+			layer.msg("${message}");
+		</script>
+	</c:if>
+	<c:if test="${not empty error}">
+		<script type="text/javascript">
+			layer.msg("${error}");
+		</script>
+	</c:if>
+</footer>

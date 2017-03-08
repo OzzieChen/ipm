@@ -51,6 +51,11 @@ public class FileController {
 		return "error";
 	}
 
+	/**
+	 * @Description: 上传文本文件的POST处理
+	 * @param request
+	 * @return Resp<?> @ResponseBody注解会使Resp<?>自动转为json传到前端
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/import", method = RequestMethod.POST)
 	public Resp<?> importPOST(HttpServletRequest request, @RequestParam("file") MultipartFile fileUp, HttpServletResponse response) {
@@ -78,6 +83,11 @@ public class FileController {
 		return resp;
 	}
 
+	/**
+	 * @Description: 上传文本的POST处理
+	 * @param request
+	 * @return Resp<?> @ResponseBody注解会使Resp<?>自动转为json传到前端
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/import2", method = RequestMethod.POST)
 	public Resp<?> importPOST2(HttpServletRequest request) {
