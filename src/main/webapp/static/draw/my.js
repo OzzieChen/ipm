@@ -138,6 +138,7 @@ function GooFlow(bgDiv, property) {
 	this.$nodeRemark = {};// 每一种结点或按钮的说明文字,JSON格式,key为类名,value为用户自定义文字说明
 	this.$nowType = "cursor";// 当前要绘制的对象类型
 	this.$lineData = {};
+	this.$iamId = "";
 	this.$lineCount = 0;
 	this.$nodeData = {};
 	this.$nodeCount = 0;
@@ -190,7 +191,7 @@ function GooFlow(bgDiv, property) {
 						break;
 					case "ico_save" :
 						if (This.onBtnSaveClick != null)
-							This.onBtnSaveClick(This.$title,This.$description);
+							This.onBtnSaveClick(This.$title, This.$description, This.$iamId);
 						break;
 					case "ico_undo" :
 						This.undo();
@@ -207,10 +208,12 @@ function GooFlow(bgDiv, property) {
 	}
 	var toolWidth = 0;
 	if (property.haveTool) {
-		this.$bgDiv.append("<div class='GooFlow_tool'" + (property.haveHead ? "" : " style='margin-top:3px'") + "><div style='height:" + (height - headHeight - (property.haveHead ? 7 : 10)) + "px' class='GooFlow_tool_div'></div></div>");
+		this.$bgDiv
+				.append("<div class='GooFlow_tool'" + (property.haveHead ? "" : " style='margin-top:3px'") + "><div style='height:" + (height - headHeight - (property.haveHead ? 7 : 10)) + "px' class='GooFlow_tool_div'></div></div>");
 		this.$tool = this.$bgDiv.find(".GooFlow_tool div");
 		// 未加代码：加入绘图工具按钮
-		this.$tool.append("<a href='javascript:void(0)' class='GooFlow_tool_btndown' id='" + this.$id + "_btn_cursor'><b class='ico_cursor'/></a><a href='javascript:void(0)' class='GooFlow_tool_btn' id='" + this.$id + "_btn_direct'><b class='ico_direct'/></a>");
+		this.$tool
+				.append("<a href='javascript:void(0)' class='GooFlow_tool_btndown' id='" + this.$id + "_btn_cursor'><b class='ico_cursor'/></a><a href='javascript:void(0)' class='GooFlow_tool_btn' id='" + this.$id + "_btn_direct'><b class='ico_direct'/></a>");
 		if (property.toolBtns && property.toolBtns.length > 0) {
 			tmp = "<span/>";
 			for (var i = 0; i < property.toolBtns.length; ++i) {
@@ -281,8 +284,8 @@ function GooFlow(bgDiv, property) {
 			var ev = mousePosition(e), t = getElCoordinate(this);
 			X = ev.x - t.left + this.parentNode.scrollLeft;
 			Y = ev.y - t.top + this.parentNode.scrollTop;
-			e.data.inthis.addNode(e.data.inthis.$id + "_node_" + e.data.inthis.$max, {
-				name : "node_" + e.data.inthis.$max,
+			e.data.inthis.addNode(e.data.inthis.$id + "n_" + e.data.inthis.$max, {
+				name : "s_" + e.data.inthis.$max,
 				left : X,
 				top : Y,
 				type : e.data.inthis.$nowType
@@ -813,17 +816,18 @@ GooFlow.prototype = {
 				case "B" :// 绑定变色功能
 					var id = e.target.parentNode.id;
 					switch (This.$areaData[id].color) {
-						case "red" :
-							This.setAreaColor(id, "yellow");
+						/** ************************* */
+						case "r" :
+							This.setAreaColor(id, "y");
 							break;
-						case "yellow" :
-							This.setAreaColor(id, "blue");
+						case "y" :
+							This.setAreaColor(id, "b");
 							break;
-						case "blue" :
-							This.setAreaColor(id, "green");
+						case "b" :
+							This.setAreaColor(id, "g");
 							break;
-						case "green" :
-							This.setAreaColor(id, "red");
+						case "g" :
+							This.setAreaColor(id, "r");
 							break;
 					}
 					return false;
@@ -832,9 +836,9 @@ GooFlow.prototype = {
 			var ev = mousePosition(e), t = getElCoordinate(this);
 			X = ev.x - t.left + this.parentNode.parentNode.scrollLeft;
 			Y = ev.y - t.top + this.parentNode.parentNode.scrollTop;
-			var color = ["red", "yellow", "blue", "green"];
-			e.data.inthis.addArea(e.data.inthis.$id + "_area_" + e.data.inthis.$max, {
-				name : "area_" + e.data.inthis.$max,
+			var color = ["r", "y", "b", "g"];
+			e.data.inthis.addArea(e.data.inthis.$id + "a_" + e.data.inthis.$max, {
+				name : "a_" + e.data.inthis.$max,
 				left : X,
 				top : Y,
 				color : color[e.data.inthis.$max % 4],
@@ -893,12 +897,14 @@ GooFlow.prototype = {
 			this.$nodeDom[id] = $("<div class='GooFlow_item" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px'><table cellspacing='1' style='width:" + (json.width - 2) + "px;height:" + (json.height - 2) + "px;'><tr><td class='ico'><b class='ico_" + json.type + "'></b></td><td>" + json.name + "</td></tr></table><div style='display:none'><div class='rs_bottom'></div><div class='rs_right'></div><div class='rs_rb'></div><div class='rs_close'></div></div></div>");
 			if (json.type == 'complex')
 				this.$nodeDom[id].addClass('item_complex');
-		}else if (json.type == "ln") { 
-			json.width = 13;/***************/
+		} else if (json.type == "ln") {
+			json.width = 13;
+			/** ************ */
 			json.height = 13;
 			this.$nodeDom[id] = $("<div class='GooFlow_item item_round" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px;width:12px;height:12px;'><table cellspacing='0' style='width:12px;height:12px;'><tr><td class='ico'><b class='yy ico_" + json.type + "'></b></td></tr></table><div style='display:none'><div class='rs_close'></div></div><div class='span'></div></div>");
-		}else {
-			json.width = 24;/***************/
+		} else {
+			json.width = 24;
+			/** ************ */
 			json.height = 24;
 			this.$nodeDom[id] = $("<div class='GooFlow_item item_round" + mark + "' id='" + id + "' style='top:" + json.top + "px;left:" + json.left + "px'><table cellspacing='0'><tr><td class='ico'><b class='ico_" + json.type + "'></b></td></tr></table><div style='display:none'><div class='rs_close'></div></div><div class='span'></div></div>");
 		}
@@ -1020,7 +1026,7 @@ GooFlow.prototype = {
 				return;
 			var lineStart = This.$workArea.data("lineStart");
 			if (lineStart)
-				This.addLine(This.$id + "_line_" + This.$max, {
+				This.addLine(This.$id + "l_" + This.$max, {
 					from : lineStart.id,
 					to : this.id,
 					name : ""
@@ -1305,8 +1311,8 @@ GooFlow.prototype = {
 				return;
 			oldName = this.$nodeData[id].name;
 			this.$nodeData[id].name = name;
-			if (this.$nodeData[id].type == "start" || this.$nodeData[id].type == "end"|| this.$nodeData[id].type == "ln") {
-				//this.$nodeDom[id].children(".span").text(name);/******************/
+			if (this.$nodeData[id].type == "start" || this.$nodeData[id].type == "end" || this.$nodeData[id].type == "ln") {
+				// this.$nodeDom[id].children(".span").text(name);/******************/
 			} else {
 				this.$nodeDom[id].find("td:eq(1)").text(name);
 				var hack = 0;
@@ -1372,7 +1378,7 @@ GooFlow.prototype = {
 			return;
 		if (this.onItemResize != null && !this.onItemResize(id, "node", width, height))
 			return;
-		if (this.$nodeData[id].type == "start" || this.$nodeData[id].type == "end"|| this.$nodeData[id].type == "ln")
+		if (this.$nodeData[id].type == "start" || this.$nodeData[id].type == "end" || this.$nodeData[id].type == "ln")
 			return;
 		if (this.$undoStack) {
 			var paras = [id, this.$nodeData[id].width, this.$nodeData[id].height];
@@ -1429,9 +1435,11 @@ GooFlow.prototype = {
 	// 载入一组数据
 	loadData : function(data) {
 		this.setTitle(data.title);
-		this.$description=data.description;
+		this.$description = data.description;
 		if (data.initNum)
 			this.$max = data.initNum;
+		if (data.iamId != undefined && data.iamId != null)
+			this.$iamId = data.iamId;
 		for ( var i in data.nodes)
 			this.addNode(i, data.nodes[i]);
 		for ( var j in data.lines)
@@ -1538,7 +1546,7 @@ GooFlow.prototype = {
 				text.setAttribute("text-anchor", "middle");
 				text.setAttribute("x", x);
 				text.setAttribute("y", y);
-				text.setAttribute("textLength",50);
+				text.setAttribute("textLength", 50);
 				line.style.cursor = "pointer";
 				text.style.cursor = "text";
 			}
@@ -1619,7 +1627,7 @@ GooFlow.prototype = {
 			text.setAttribute("text-anchor", "middle");
 			text.setAttribute("x", x);
 			text.setAttribute("y", y);
-			text.setAttribute("textLength",50);
+			text.setAttribute("textLength", 50);
 			text.style.cursor = "text";
 			poly.style.cursor = "pointer";
 		} else {
@@ -2090,7 +2098,7 @@ GooFlow.prototype = {
 			var paras = [id, this.$areaData[id].color];
 			this.pushOper("setAreaColor", paras);
 		}
-		if (color == "red" || color == "yellow" || color == "blue" || color == "green") {
+		if (color == "r" || color == "y" || color == "b" || color == "g") {
 			this.$areaDom[id].removeClass("area_" + this.$areaData[id].color).addClass("area_" + color);
 			this.$areaData[id].color = color;
 		}
@@ -2127,7 +2135,7 @@ GooFlow.prototype = {
 		if (this.$undoStack) {
 			this.pushOper("delArea", [id]);
 		}
-		this.$areaDom[id] = $("<div id='" + id + "' class='GooFlow_area area_" + json.color + "' style='top:" + json.top + "px;left:" + json.left + "px'><div class='bg' style='width:" + (json.width - 2) + "px;height:" + (json.height - 2) + "px'></div>" + "<label>" + /*json.name*/"" + "</label><b></b><div><div class='rs_bottom'></div><div class='rs_right'></div><div class='rs_rb'></div><div class='rs_close'></div></div></div>");
+		this.$areaDom[id] = $("<div id='" + id + "' class='GooFlow_area area_" + json.color + "' style='top:" + json.top + "px;left:" + json.left + "px'><div class='bg' style='width:" + (json.width - 2) + "px;height:" + (json.height - 2) + "px'></div>" + "<label>" + /* json.name */"" + "</label><b></b><div><div class='rs_bottom'></div><div class='rs_right'></div><div class='rs_rb'></div><div class='rs_close'></div></div></div>");
 		this.$areaData[id] = json;
 		this.$group.append(this.$areaDom[id]);
 		if (this.$nowType != "group")

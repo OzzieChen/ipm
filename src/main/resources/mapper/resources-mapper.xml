@@ -27,81 +27,74 @@
 		select p.icon picon,p.parent_id pparent_id,p.name pname,p.ordr pordr,c.*
 		from
 		(select * from resource where type='menu' and parent_id>0) c
-		left join resource p on c.parent_id=p.id order by pordr asc,c.ordr asc
+		left join
+		resource p on c.parent_id=p.id order by pordr asc,c.ordr asc
 	</select>
 
-	<!-- <resultMap type="Resource" id="resChildrenMap2">
-		<result property="name" column="pname" />
-		<collection property="children" ofType="Resource">
-			<id property="id" column="id" />
-			<result property="name" column="name" />
-			<result property="parentId" column="parent_id" />
-			<result property="resKey" column="res_key" />
-			<result property="resUrl" column="res_url" />
-			<result property="icon" column="icon" />
-			<result property="type" column="type" />
-			<result property="description" column="description" />
-			<result property="parentIds" column="parent_ids" />
-			<result property="openWay" column="openWay" />
-			<result property="checked" column="checked" />
+	<resultMap type="Automata" id="automataMap">
+		<id property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="description" column="description" />
+		<collection property="nodes" ofType="Node">
+			<id property="id" column="nid" />
+			<result property="name" column="nn" />
+			<result property="left" column="nl" />
+			<result property="top" column="nt" />
+			<result property="width" column="nw" />
+			<result property="height" column="nh" />
+			<result property="type" column="nty" />
+			<result property="marked" column="nm" javaType="java.lang.Boolean" jdbcType="BIT" />
+			<result property="alt" column="na" javaType="java.lang.Boolean" jdbcType="BIT" />
+		</collection>
+		<collection property="lines" ofType="Line">
+			<id property="id" column="lid" />
+			<result property="from" column="lf" />
+			<result property="to" column="lto" />
+			<result property="name" column="ln" />
+			<result property="type" column="lt" />
+			<result property="M" column="lM" />
+			<result property="marked" column="lmk" javaType="java.lang.Boolean" jdbcType="BIT" />
+			<result property="alt" column="la" javaType="java.lang.Boolean" jdbcType="BIT" />
+		</collection>
+		<collection property="areas" ofType="Area">
+			<id property="id" column="aid" />
+			<result property="name" column="an" />
+			<result property="left" column="al" />
+			<result property="top" column="at" />
+			<result property="width" column="aw" />
+			<result property="height" column="ah" />
+			<result property="color" column="ac" />
+			<result property="alt" column="aa" javaType="java.lang.Boolean" jdbcType="BIT" />
 		</collection>
 	</resultMap>
-
-	<select id="findResAndChildrenByRoleId" resultMap="resChildrenMap2">
-		select p.name pname,c.*
-		from (select * from resource where id in (select res_id from role_res where role_id=#{value})
-		and parent_id>0 and level
-		> 0) c
-		left
-		join
-		resource p on c.parent_id=p.id
-	</select>
-
-	<select id="findResources" parameterType="Resource" resultType="Resource">
-		select * from resource
-		<where>
-			level > 0
-			<if test="parentId!=null">
-				and parent_id &lt; #{parentId}
-			</if>
-			<if test="type!=null and type!=''">
-				and type = #{type}
-			</if>
-			<if test="resKey!=null">
-				and res_key = #{resKey}
-			</if>
-			<if test="name!=null and name!=''">
-				and name like concat(concat('%',#{name}),'%')
-			</if>
-		</where>
-		order by parent_ids asc
-	</select>
-
-	<select id="findResPListByKeys" resultMap="resourceMap">
-		select p.icon picon,p.parent_id pparent_id,p.name pname,p.ordr pordr,c.*
+	<select id="findAutomataInfo" resultMap="automataMap">
+		select
+		au.id,au.title,au.description,
+		n.id nid,n.name nn,n.left nl,n.top nt,n.width nw,n.height nh,n.type nty,n.marked nm,n.alt na,
+		l.id lid,l.from lf,l.to lto,l.name ln,l.type lt,l.M lM,l.marked lmk,l.alt la,
+		a.id aid,a.name an,a.left al,a.top at,a.width aw,a.height ah,a.color ac,a.alt aa
 		from
-		(select * from resource where res_key in
-		<foreach collection="attrs" item="item" open="(" separator="," close=")">
-			#{item}
-		</foreach>
-		and parent_id>0 and level>0) c
-		left join resource p on c.parent_id=p.id
+		(select * from automata where id=#{id}) au
+		left join node n on au.id=n.amId
+		left join line l on au.id=l.amId
+		left join area a on au.id=a.amId
 	</select>
 
-	<select id="findResourcesByAttr" resultType="Resource">
-		select * from resource where ${attr} in
-		<foreach collection="attrs" item="item" open="(" separator="," close=")">
-			#{item}
-		</foreach>
-		and level > 0
-		order by parent_ids
-	</select>
+	<insert id="createAutomataUnits">
+		<choose>
+			<when test="op == 'n'">
+				insert into node (id,amId,name,`left`,top,width,height,type,marked,alt) values
+				<foreach collection="list" separator="," item="o">(#{o.id},#{o.amId},#{o.name},#{o.left},#{o.top},#{o.width},#{o.height},#{o.type},#{o.marked},#{o.alt})</foreach>
+			</when>
+			<when test="op == 'l'">
+				insert into area (id,amId,name,`left`,top,width,height,color,alt) values
+				<foreach collection="list" item="o">(#{id},#{o.amId},#{o.name},#{o.left},#{o.top},#{o.width},#{o.height},#{o.color},#{o.alt})</foreach>
+			</when>
+			<when test="op == 'a'">
+				insert into node (id,amId,name,`from`,`to`,type,M,marked,alt) values
+				<foreach collection="list" item="o">(#{o.id},#{o.amId},#{o.name},#{o.from},#{o.to},#{o.type},#{o.M},#{o.marked},#{o.alt})</foreach>
+			</when>
+		</choose>
+	</insert>
 
-	<select id="findResAttrByResIds" resultType="String">
-		select ${attr} from resource where id in
-		<foreach collection="ids" item="item" open="(" separator="," close=")">
-			#{item}
-		</foreach>
-		and level > 0
-	</select> -->
 </mapper>

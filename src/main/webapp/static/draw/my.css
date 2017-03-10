@@ -66,15 +66,15 @@ v\:group,v\:rect,v\:imagedata,v\:oval,v\:line,v\:polyline,v\:stroke,v\:textbox {
 .GooFlow_area label{cursor:text;top:1px;left:1px;position:absolute;display:block;font-size:12px;text-indent:18px;height:18px;line-height:18px}
 .GooFlow_work .lock label{cursor:default;}
 .GooFlow_area b{display:block;height:18px;widht:18px;top:0px;left:0px;position:absolute;cursor:pointer}
-.GooFlow_work .area_red .bg{border:1px solid red;background-color:#FF7865}
-.GooFlow_work .area_red label{color:red;
+.GooFlow_work .area_r .bg{border:1px solid red;background-color:#FF7865}
+.GooFlow_work .area_r label{color:red;
 background:url(gooflow_bullet.png) no-repeat 1px 1px}
-.GooFlow_work .area_yellow .bg{border:1px solid #CD925A;background-color:#FFD564}
-.GooFlow_work .area_yellow label{color:#FFBA1D;background:url(gooflow_bullet.png) no-repeat 1px -16px}
-.GooFlow_work .area_blue .bg{border:1px solid #347BB1;background-color:#549CDE}
-.GooFlow_work .area_blue label{color:#347BB1;background:url(gooflow_bullet.png) no-repeat 1px -33px}
-.GooFlow_work .area_green .bg{border:1px solid green;background-color:#84CA04}
-.GooFlow_work .area_green label{color:green;background:url(gooflow_bullet.png) no-repeat 1px -50px}
+.GooFlow_work .area_y .bg{border:1px solid #CD925A;background-color:#FFD564}
+.GooFlow_work .area_y label{color:#FFBA1D;background:url(gooflow_bullet.png) no-repeat 1px -16px}
+.GooFlow_work .area_b .bg{border:1px solid #347BB1;background-color:#549CDE}
+.GooFlow_work .area_b label{color:#347BB1;background:url(gooflow_bullet.png) no-repeat 1px -33px}
+.GooFlow_work .area_g .bg{border:1px solid green;background-color:#84CA04}
+.GooFlow_work .area_g label{color:green;background:url(gooflow_bullet.png) no-repeat 1px -50px}
 
 .GooFlow_work svg{display:block;position:absolute}
 .GooFlow_work v\:group{position:relative;display:block}

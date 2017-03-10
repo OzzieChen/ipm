@@ -18,7 +18,7 @@
 </style>
 </head>
 <body>
-	<div id="demo"></div>
+	<div id="Do"></div>
 	<script type="text/javascript" src="${ctx}/static/lib/jquery-2.1.4.min.js"></script>
 	<script type="text/javascript" src="${ctx}/static/lib/layer/layer.js"></script>
 	<script type="text/javascript" src="${ctx}/static/draw/my.js"></script>
@@ -26,114 +26,81 @@
 		function postform1(obj) {
 			var form = $(obj).closest("form");
 			//普通表单
+			var ititle = $(form).find("input[name=title]").val();
+			var ides = $(form).find("textarea[name=des]").val();
 			$.ajax({
-				type : form.attr('method'),
-				url : form.attr('action'),
-				dataType : "json",
-				data : "title=" + $(form).find("input[name=title]").val() + "&description=" + $(form).find("input[name=des]").val() + "&bjson=" + JSON.stringify(demo.exportData())
-			}).success(function(idata) {
-				var errorCode = idata.error_code;
-				if (errorCode == 0) {
-					layer.msg(idata.reason, {
-						icon : 1,
-						time : 3500
+					type : form.attr('method'),
+					url : form.attr('action'),
+					dataType : "json",
+					data : "id=" + $(form).find("input[name=amId]").val() + "&title=" + ititle + "&description=" + ides + "&bjson=" + JSON
+								.stringify(Do.exportData())
+					}).success(function(idata) {
+						var errorCode = idata.error_code;
+						if (errorCode == 0) {
+							layer.msg(idata.reason, {
+								icon : 1,
+								time : 3500
+							});
+							Do.$iamId=idata.result[0];
+							Do.$description=ides;
+							Do.$title=ititle;
+							var lb = $(".GooFlow_head").find("label")[0];
+							if(lb!=undefined){
+								lb.title=ititle;
+								$(lb).html(ititle);
+							}
+							$(':input', form).not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected')
+						} else {
+							if (idata.reason != null)
+								layer.msg(idata.reason, {
+									icon : 5,
+									time : 6000
+								});
+						}
+					}).fail(function(jqXHR, textStatus, errorThrown) {
+						alert('数据加载失败')//错误信息
 					});
-					$(':input', form).not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected')
-				} else {
-					if (idata.reason != null)
-						layer.msg(idata.reason, {
-							icon : 5,
-							time : 6000
-						});
-				}
-			}).fail(function(jqXHR, textStatus, errorThrown) {
-				alert('数据加载失败')//错误信息
-			});
 			return false;
 		}
-		var winWidth = 1200, winHeight = 600;
-		if (window.innerWidth)
-			winWidth = window.innerWidth;
-		else if ((document.body) && (document.body.clientWidth))
-			winWidth = document.body.clientWidth;
-		// 获取窗口高度
-		if (window.innerHeight)
-			winHeight = window.innerHeight;
-		else if ((document.body) && (document.body.clientHeight))
-			winHeight = document.body.clientHeight;
-		jsondata = {
-			title : "aaa",
-			description : "2222",
-			nodes : {
-				demo_node_1 : {
-					name : "node_1",
-					left : 67,
-					top : 69,
-					type : "start",
-					width : 24,
-					height : 24
-				},
-				demo_node_2 : {
-					name : "node_2",
-					left : 219,
-					top : 71,
-					type : "t",
-					width : 60,
-					height : 24
-				},
-				demo_node_5 : {
-					name : "node_5",
-					left : 380,
-					top : 71,
-					type : "n",
-					width : 60,
-					height : 24
-				}
-			},
-			lines : {
-				demo_line_3 : {
-					type : "sl",
-					from : "demo_node_1",
-					to : "demo_node_2",
-					name : "0000",
-					marked : false
-				},
-				demo_line_6 : {
-					type : "sl",
-					from : "demo_node_2",
-					to : "demo_node_5",
-					name : "",
-					marked : true
-				}
-			},
-			areas : {
-				demo_area_8 : {
-					name : "area_8",
-					left : 35,
-					top : 39,
-					color : "red",
-					width : 472,
-					height : 114
-				}
-			}
-		};
+		function getWindowWH() {
+			var winWidth = 1210, winHeight = 610;
+			if (window.innerWidth)
+				winWidth = window.innerWidth;
+			else if ((document.body) && (document.body.clientWidth))
+				winWidth = document.body.clientWidth;
+			// 获取窗口高度
+			if (window.innerHeight)
+				winHeight = window.innerHeight;
+			else if ((document.body) && (document.body.clientHeight))
+				winHeight = document.body.clientHeight;
+			winHeight -= 2;
+			winWidth -= 2;
+			return {
+				w : winWidth,
+				h : winHeight
+			};
+		}
+
+		jsondata = ${jsonData};
+		var winWH = getWindowWH();
 		var property = {
-			width : winWidth,
-			height : winHeight,
+			width : winWH.w,
+			height : winWH.h,
 			toolBtns : ["start", "end", "t", "n", "c", "ln"],
 			haveHead : true,
 			headBtns : ["save", "undo", "redo", "reload"],//如果haveHead=true，则定义HEAD区的按钮
 			haveTool : true,
 			haveGroup : true,
 			useOperStack : true,
-			onBtnSaveClick : function(title, des) {
+			onBtnSaveClick : function(title, des, amId) {
 				var hform = "";
-				hform += '<form method="post" class="myform" action="${ctx}">';
+				hform += '<form method="post" class="myform" action="${ctx}${myurl}">';
 				hform += '<div style="width:80%;margin-left:10%">';
 				hform += '	<span style="color:red">*</span>服务/协议 名称：<br>';
 				hform += '		<input type="text" name="title" value="'+title+'" />';
+				hform += '		<input hidden="hidden" type="text" name="amId" value="'+amId+'" />';
 				hform += '<br>描述：<br>';
-				hform += '		<textarea name="des" cols="22" rows="3">'+des+'</textarea>';
+				hform += '		<textarea name="des" cols="22" rows="3">' + des + '</textarea>';
 				hform += '				<br><button type="button" style="display:inline-block;cursor:pointer;text-align:center; font-weight:400;white-space:nowrap;vertical-align: middle;" onclick="postform1(this)" class="layui-btn">提交</button>';
 				hform += '</div>';
 				hform += '</form>';
@@ -159,16 +126,14 @@
 			ln : "连线节点",
 			group : "组织划分框编辑开关"
 		};
-		var demo;
+		var Do;
 		$(document).ready(function() {
-			demo = $.createGooFlow($("#demo"), property);
-			demo.setNodeRemarks(remark);
-			demo.onItemDel = function(id, type) {
+			Do = $.createGooFlow($("#Do"), property);
+			Do.setNodeRemarks(remark);
+			Do.onItemDel = function(id, type) {
 				return confirm("确定要删除该单元吗?");
 			}
-
-			demo.$max = 9;
-			demo.loadData(jsondata);
+			Do.loadData(jsondata);
 		});
 	</script>
 </body>

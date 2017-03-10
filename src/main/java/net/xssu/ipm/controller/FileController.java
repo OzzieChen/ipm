@@ -25,7 +25,7 @@ public class FileController {
 	@RequestMapping(value = "/")
 	public String index(HttpServletRequest request, Model model) {
 		model.addAttribute("myurl", "/import");
-		return "index2";
+		return "index";
 	}
 
 	// 页面出错
