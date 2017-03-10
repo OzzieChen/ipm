@@ -18,8 +18,25 @@ public class RedisTest {
 
     @Test
     public void addPatternTest() {
-        //long oriSize = stringRedisTemplate.opsForHash().size("patterns");
-        long newSize = redisService.storePatternString("testValue123");
+        long newSize = redisService.storePatternString("# patterns begin\n" +
+                "send_num = 3\n" +
+                "recv_num = 6\n" +
+                "\n" +
+                "s0.msg = “GET / HTTP/1.0\\r\\nUser-Agent: Patterns 1.0\\r\\nAccept: */*\\r\\n\\r\\n\"\n" +
+                "s0.waiting = r0\n" +
+                "\n" +
+                "s1.msg = \"GET /index.php HTTP/1.0\\r\\nUser-Agent: Patterns 1.0\\r\\nAccept: */*\\r\\n\\r\\n\"\n" +
+                "s1.waiting = r2\n" +
+                "\n" +
+                "s2.msg = “GET /login HTTP/1.0\\r\\nUser-Agent: Patterns 1.0\\r\\nAccept: */*\\r\\n\\r\\n\"\n" +
+                "s2.waiting = r3\n" +
+                "\n" +
+                "r0.is_banner = true\n" +
+                "r0.patterns = {“HTTP 1.”, “200 OK\"}\n" +
+                "r0.goto = r1\n" +
+                "\n" +
+                "r1.patterns = {“Nginx”, “Apache”}\n" +
+                "r1.goto = {0, s1}, {1, s2}");
         assertNotEquals(newSize, -1);
     }
 
