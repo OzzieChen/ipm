@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+             xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/rabbit
+        http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- RabbitMQ stuff -->
+    <rabbit:connection-factory id="connectionFactory"
+                               host="${rabbitmq.host}"
+                               port="${rabbitmq.port}"
+                               username="${rabbitmq.username}"
+                               password="${rabbitmq.password}"/>
+
+    <rabbit:admin connection-factory="connectionFactory"/>
+    <rabbit:queue id="scanTaskQueue" name="scan.task"/>
+    <rabbit:queue id="scanResultQueue" name="scan.result"/>
+
+    <rabbit:template id="jsonRabbitTemplate"
+                     connection-factory="connectionFactory"
+                     message-converter="jsonMessageConverter"/>
+    <rabbit:template id="plainRabbitTemplate"
+                     connection-factory="connectionFactory"/>
+
+    <!-- listener -->
+    <rabbit:listener-container connection-factory="connectionFactory" message-converter="jsonMessageConverter">
+        <rabbit:listener ref="comingResultListener"
+                         method="handleComingResultMsg"
+                         queues="scanResultQueue" />
+    </rabbit:listener-container>
+
+    <!-- Beans -->
+    <bean id="rabbitmqConfigBean" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>classpath:properties/rabbitmq.properties</value>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders">
+            <value>true</value>
+        </property>
+    </bean>
+
+    <bean id="jsonMessageConverter"
+          class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter">
+    </bean>
+
+    <bean id="sendingService" class="net.xssu.ipm.service.impl.MQSendingServiceImpl">
+        <constructor-arg ref="jsonRabbitTemplate"/>
+        <constructor-arg ref="scanTaskQueue"/>
+    </bean>
+
+    <bean id="comingResultListener" class="net.xssu.ipm.controller.MQComingResultHandler">
+        <constructor-arg ref="plainRabbitTemplate"/>
+    </bean>
+
+</beans>

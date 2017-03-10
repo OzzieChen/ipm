@@ -28,4 +28,7 @@
 
 	<task:annotation-driven scheduler="qbScheduler" mode="proxy" />
 	<task:scheduler id="qbScheduler" pool-size="10" />
+
+	<import resource="spring-rabbitmq.xml"/>
+    <import resource="spring-redis.xml"/>
 </beans>
